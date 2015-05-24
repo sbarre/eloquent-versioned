@@ -18,6 +18,32 @@ To add via composer:
 require sbarre/eloquent-versioned
 ```
 
+## Migrations
+
+Versioned models require that your database table contain 3 fields to handle the versioning.
+
+If you are creating a new table, or if you are changing an existing table, include the following lines in the `up()` method of the migration:
+
+```php
+$table->integer('model_id')->unsigned()->default(1);
+$table->integer('version')->unsigned()->default(1);
+$table->integer('is_current_version')->unsigned()->default(1);
+$table->index('is_current_version');
+$table->index('model_id');
+$table->index('version');
+```
+
+If your migration was altering an existing table, you should include these lines in the `down()` method of your migration:
+
+```php
+$table->dropColumn(['model_id','version','is_current_version']);
+$table->dropIndex(['model_id','version','is_current_version']);
+```
+
+#### Caveats
+
+If you change the constants in `EloquentVersioned\VersionedBuilder` to rename the columns, remember to change them in your migrations as well.
+
 ## Usage
 
 In your Eloquent model class, start by adding the `use` statement for the Trait:
@@ -150,32 +176,6 @@ $oldVersions = Project::onlyOldVersions()->find(1);
 ```
 
 Otherwise, the rest of Eloquent's ORM operations should work as usual, including the out-of-the-box relations.
-
-## Migrations
-
-The Versioned trait requires that your table contain 3 fields to handle the versioning.
-
-If you are creating a new table, or if you are changing an existing table, include the following lines in the `up()` method of the migration:
-
-```php
-$table->integer('model_id')->unsigned()->default(1);
-$table->integer('version')->unsigned()->default(1);
-$table->integer('is_current_version')->unsigned()->default(1);
-$table->index('is_current_version');
-$table->index('model_id');
-$table->index('version');
-```
-
-If your migration was altering an existing table, you should include these lines in the `down()` method of your migration:
-
-```php
-$table->dropColumn(['model_id','version','is_current_version']);
-$table->dropIndex(['model_id','version','is_current_version']);
-```
-
-#### Caveats
-
-If you change the constants in `EloquentVersioned\VersionedBuilder` to rename the columns, remember to change them in your migrations as well.
 
 ## Support & Roadmap
 
