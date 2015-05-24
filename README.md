@@ -115,7 +115,7 @@ Array
     [id] => 1
     [model_id] => 1
     [version] => 1
-    **[is_current_version] => 0**
+    [is_current_version] => 0
     [name] => Project Name
     [email] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
