@@ -14,6 +14,11 @@
             "email": "sbarre@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "EloquentVersioned\\": "src/"
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "0.0.1-dev"
