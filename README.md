@@ -2,6 +2,8 @@
 
 Adds transparent versioning support to Laravel 5's Eloquent ORM.
 
+**WARNING: This repository is currently super-duper experimental.  I will gladly accept pull requests and issues, but you probably shouldn't use this in production, and the interfaces may change without notice (although major changes will bump the version).**
+
 ## Installation
 
 To add via composer:
