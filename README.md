@@ -73,7 +73,7 @@ Array
     [id] => 1
     [version] => 1
     [name] => Project Name
-    [email] => Project description goes here
+    [description] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
     [updated_at] => 2015-05-24 17:16:05
 )
@@ -89,7 +89,7 @@ Array
     [version] => 1
     [is_current_version] => 1
     [name] => Updated project Name
-    [email] => Project description goes here
+    [description] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
     [updated_at] => 2015-05-24 17:16:05
 )
@@ -111,7 +111,7 @@ Array
     [id] => 1
     [version] => 2
     [name] => Updated project Name
-    [email] => Project description goes here
+    [description] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
     [updated_at] => 2015-05-24 17:16:45
 )
@@ -127,7 +127,7 @@ Array
     [version] => 2
     [is_current_version] => 1
     [name] => Updated project Name
-    [email] => Project description goes here
+    [description] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
     [updated_at] => 2015-05-24 17:16:45
 )
@@ -143,7 +143,7 @@ Array
     [version] => 1
     [is_current_version] => 0
     [name] => Project Name
-    [email] => Project description goes here
+    [description] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
     [updated_at] => 2015-05-24 17:16:05
 )
