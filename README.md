@@ -6,9 +6,9 @@ Adds transparent versioning support to Laravel 5's Eloquent ORM.
 
 When using this trait (and with a table that includes the required fields), saving your model will actually create a new row instead, and increment the version number.  
 
-Using special global scopes, old versions are ignored in the standard ORM operations (selects, updates, deletes) and in relations.
+Using global scopes, old versions are ignored in the standard ORM operations (selects, updates, deletes) and relations (hasOne, hasMany, belongsTo, etc).
 
-The package also provides some special versions to include old versions in queries (or only query old versions) which can be useful for showing a model's history, or the like.
+The package also provides some special methods to include old versions in queries (or only query old versions) which can be useful for showing a model's history, or the like.
 
 ## Installation
 
@@ -53,6 +53,22 @@ Array
 )
 ```
 
+The actual database row looks like this:
+
+```php
+Array
+(
+    [id] => 1
+    [model_id] => 1
+    [version] => 1
+    [is_current_version] => 1
+    [name] => Updated project Name
+    [email] => Project description goes here
+    [created_at] => 2015-05-24 17:16:05
+    [updated_at] => 2015-05-24 17:16:05
+)
+```
+
 Then if you change the model and save:
 
 ```php
@@ -68,14 +84,14 @@ Array
 (
     [id] => 1
     [version] => 2
-    [name] => Project Name
+    [name] => Updated project Name
     [email] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
-    [updated_at] => 2015-05-24 17:16:05
+    [updated_at] => 2015-05-24 17:16:45
 )
 ```
 
-In reality this is actually a new model that looks like this:
+The model mutates the `model_id` column into `id`, and hides some of the version-specific columns.  In reality this is actually a new database row that looks like this:
 
 ```php
 Array
@@ -91,7 +107,7 @@ Array
 )
 ```
 
-And our first version looks like this:
+While the row for our first version now looks like this:
 
 ```php
 Array
@@ -99,7 +115,7 @@ Array
     [id] => 1
     [model_id] => 1
     [version] => 1
-    [is_current_version] => 0
+    **[is_current_version] => 0**
     [name] => Project Name
     [email] => Project description goes here
     [created_at] => 2015-05-24 17:16:05
