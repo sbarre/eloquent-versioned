@@ -15,9 +15,9 @@ trait Versioned {
         static::addGlobalScope( new VersioningScope() );
     }
 
-    protected getHideVersioned($hide = array())
+    protected function getHideVersioned($hide = array())
     {
-        return array_merge($hide,$this->hideVersioned);
+        return array_merge($hide, $this->hideVersioned);
     }
 
     /*
@@ -28,7 +28,7 @@ trait Versioned {
      * @return mixed
      */
     public function getIdAttribute() {
-        return ( $this->{static::getIsCurrentVersionColumn()} == 0 ) ? $this->attributes[$this->primaryKey] : $this->attributes[ {static::getModelIdColumn()} ];
+        return ( $this->{static::getIsCurrentVersionColumn()} == 0 ) ? $this->attributes[$this->primaryKey] : $this->attributes[ static::getModelIdColumn() ];
     }
 
     /*
