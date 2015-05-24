@@ -1,0 +1,22 @@
+{
+    "name": "sbarre/eloquent-versioned",
+    "description": "Add transparent versioning to Laravel 5's Eloquent ORM",
+    "keywords": ["laravel", "versioning", "orm", "eloquent" ],
+    "homepage": "https://github.com/sbarre/eloquent-versioned",
+    "require": {
+        "php": ">=5.4",
+        "laravel/framework": "~5.0.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastien Barre",
+            "email": "sbarre@gmail.com"
+        }
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.0.1-dev"
+        }
+    }
+}
