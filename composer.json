@@ -3,10 +3,6 @@
     "description": "Add transparent versioning to Laravel 5's Eloquent ORM",
     "keywords": ["laravel", "versioning", "orm", "eloquent" ],
     "homepage": "https://github.com/sbarre/eloquent-versioned",
-    "require": {
-        "php": ">=5.4",
-        "illuminate/database": "~5.0"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -14,6 +10,13 @@
             "email": "sbarre@gmail.com"
         }
     ],
+    "require": {
+        "php": ">=5.4",
+        "laravel/framework": "~5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.6.*"
+    },
     "autoload": {
         "psr-4": {
             "EloquentVersioned\\": "src/"
