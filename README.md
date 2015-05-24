@@ -9,7 +9,7 @@ Adds transparent versioning support to Laravel 5's Eloquent ORM.
 To add via composer:
 
 ```
-require sbarre\eloquent-versioned
+require sbarre/eloquent-versioned
 ```
 
 ## Usage
