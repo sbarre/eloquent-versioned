@@ -12,11 +12,13 @@ The package also provides some special methods to include old versions in querie
 
 ## Installation
 
-To add via composer:
+To add via Composer:
 
 ```
-require sbarre/eloquent-versioned
+require sbarre/eloquent-versioned --no-dev
 ```
+
+Use the `--no-dev` flag to avoid pulling down all the testing dependencies (like the *entire Laravel framework*).
 
 ## Migrations
 
