@@ -12,17 +12,16 @@ class VersionedTest extends FunctionalTestCase {
 	}
 
 	/**
-	 * Test that creating our versioned model works
+	 * We should be able to create a model
 	 *
 	 * @param  array $data
-	 *
-	 * @return bool
 	 * @dataProvider createDataProvider
 	 */
 	public function testCreate( $data ) {
 		$className = $this->modelPrefix . $data['name'];
 		$model     = $className::create( $data )->fresh();
 
+		// model exists?
 		$this->assertInstanceOf( $this->modelPrefix . $data['name'], $model );
 		$this->assertEquals( 1, $model->id );
 		$this->assertEquals( 1, $model->version );
@@ -31,6 +30,9 @@ class VersionedTest extends FunctionalTestCase {
 	}
 
 	/**
+	 * Using save() should create a new version
+	 *
+	 * @param  array $data
 	 * @dataProvider createDataProvider
 	 */
 	public function testSave( $data ) {
@@ -40,6 +42,7 @@ class VersionedTest extends FunctionalTestCase {
 		$model->name = 'Updated ' . $data['name'];
 		$model->save();
 
+		// model was updated correctly?
 		$this->assertEquals( 1, $model->id );
 		$this->assertEquals( 'Updated ' . $data['name'], $model->name );
 		$this->assertEquals( 2, $model->version );
@@ -62,6 +65,9 @@ class VersionedTest extends FunctionalTestCase {
 	}
 
 	/**
+	 * Using saveMinor() should not create a new version
+	 *
+	 * @param  array $data
 	 * @dataProvider createDataProvider
 	 */
 	public function testMinorSave( $data ) {
@@ -71,6 +77,7 @@ class VersionedTest extends FunctionalTestCase {
 		$model->name = 'Updated ' . $data['name'];
 		$model->saveMinor();
 
+		// model was updated correctly?
 		$this->assertEquals( 1, $model->id );
 		$this->assertEquals( 'Updated ' . $data['name'], $model->name );
 		$this->assertEquals( 1, $model->version );
