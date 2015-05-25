@@ -1,6 +1,6 @@
 <?php namespace EloquentVersioned\Tests;
 
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Capsule\Manager as DBM;
 
 class FunctionalTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
 
     protected function configureDatabase()
     {
-        $db = new DB;
+        $db = new DBM;
         $db->addConnection(array(
             'driver'    => 'sqlite',
             'database'  => ':memory:',
@@ -27,27 +27,40 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
 
     protected function migrateTables()
     {
-        DB::schema()->create('widgets', function($table) {
+
+        DBM::schema()->create('widgets', function($table) {
             $table->increments('id');
+            $table->integer('model_id')->unsigned()->default(1);
+            $table->integer('version')->unsigned()->default(1);
+            $table->integer('is_current_version')->unsigned()->default(1);
             $table->integer('gadget_id')->unsigned()->default(0);
             $table->integer('doodad_id')->unsigned()->default(0);
             $table->string('name');
             $table->timestamps();
         });
-        DB::schema()->create('gadgets', function($table) {
+
+        DBM::schema()->create('gadgets', function($table) {
             $table->increments('id');
+            $table->integer('model_id')->unsigned()->default(1);
+            $table->integer('version')->unsigned()->default(1);
+            $table->integer('is_current_version')->unsigned()->default(1);
             $table->integer('widget_id')->unsigned()->default(0);
             $table->integer('doodad_id')->unsigned()->default(0);
             $table->string('name');
             $table->timestamps();
         });
-        DB::schema()->create('doodads', function($table) {
+
+        DBM::schema()->create('doodads', function($table) {
             $table->increments('id');
+            $table->integer('model_id')->unsigned()->default(1);
+            $table->integer('version')->unsigned()->default(1);
+            $table->integer('is_current_version')->unsigned()->default(1);
             $table->integer('gadget_id')->unsigned()->default(0);
             $table->integer('widget_id')->unsigned()->default(0);
             $table->string('name');
             $table->timestamps();
         });
+
     }
 
 }
