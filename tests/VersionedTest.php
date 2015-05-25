@@ -20,32 +20,69 @@ class VersionedTest extends FunctionalTestCase
      * @return bool
      * @dataProvider createDataProvider
      */
-    public function testCreateModel($data)
+    public function testCreate($data)
     {
         $className = $this->modelPrefix.$data['name'];
 	    $model = $className::create($data)->fresh();
 
-	    $this->assertInstanceOf('Illuminate\\Database\\Eloquent\\Model', $model);
+	    $this->assertInstanceOf($this->modelPrefix.$data['name'], $model);
 	    $this->assertEquals(1, $model->id);
 	    $this->assertEquals(1, $model->version);
 	    $this->assertEquals(1, $model->is_current_version);
+
     }
 
 	/**
-	 * @depends testCreateModel
 	 * @dataProvider createDataProvider
 	 */
-	public function testVersioningModel($data)
+	public function testSave($data)
 	{
 		$className = $this->modelPrefix.$data['name'];
 		$model = $className::create($data)->fresh();
 
-		$model->name = 'Updated Widget';
+		$model->name = 'Updated '.$data['name'];
 		$model->save();
 
 		$this->assertEquals(1, $model->id);
+		$this->assertEquals('Updated '.$data['name'], $model->name);
 		$this->assertEquals(2, $model->version);
 		$this->assertEquals(1, $model->is_current_version);
+
+		// old model exists?
+		$oldModel = $className::onlyOldVersions()->find(1);
+		$this->assertInstanceOf($this->modelPrefix.$data['name'], $oldModel);
+		$this->assertEquals(1, $oldModel->version);
+		$this->assertEquals(0, $oldModel->is_current_version);
+
+		// one record with scopes applied?
+		$models = $className::all();
+		$this->assertEquals(1, count($models));
+
+		// two records without scopes applied?
+		$models = $className::withOldVersions()->get();
+		$this->assertEquals(2, count($models));
+
+	}
+
+	/**
+	 * @dataProvider createDataProvider
+	 */
+	public function testMinorSave($data)
+	{
+		$className = $this->modelPrefix.$data['name'];
+		$model = $className::create($data)->fresh();
+
+		$model->name = 'Updated '.$data['name'];
+		$model->saveMinor();
+
+		$this->assertEquals(1, $model->id);
+		$this->assertEquals('Updated '.$data['name'], $model->name);
+		$this->assertEquals(1, $model->version);
+		$this->assertEquals(1, $model->is_current_version);
+
+		// still only one record?
+		$models = $className::all();
+		$this->assertEquals(1, count($models));
 
 	}
 
