@@ -1,7 +1,7 @@
 <?php namespace EloquentVersioned\Tests\Models;
 
-class Gadget extends BaseVersionedModel
-{
+class Gadget extends BaseVersionedModel {
+
     protected $table = 'gadgets';
 
     protected $fillable = array('*');

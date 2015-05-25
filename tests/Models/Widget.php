@@ -1,7 +1,7 @@
 <?php namespace EloquentVersioned\Tests\Models;
 
-class Widget extends BaseVersionedModel
-{
+class Widget extends BaseVersionedModel {
+
     protected $table = 'widgets';
 
     protected $fillable = array('*');

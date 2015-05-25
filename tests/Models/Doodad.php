@@ -1,7 +1,7 @@
 <?php namespace EloquentVersioned\Tests\Models;
 
-class Doodad extends BaseVersionedModel
-{
+class Doodad extends BaseVersionedModel {
+
     protected $table = 'doodads';
 
     protected $fillable = array('*');
