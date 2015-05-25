@@ -1,6 +1,5 @@
 <?php namespace EloquentVersioned\Traits;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use EloquentVersioned\Scopes\VersioningScope;
 use EloquentVersioned\Builder as VersionedBuilder;
@@ -100,6 +99,8 @@ trait Versioned {
     public function save( array $options = array() ) {
         $query = $this->newQueryWithoutScopes();
 
+        $db = $this->getConnection();
+
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
         // listeners to cancel save operations if validations fail or whatever.
@@ -116,7 +117,7 @@ trait Versioned {
 
             if ( count( $dirty ) > 0 ) {
 
-                $saved = DB::transaction( function () use ( $query ) {
+                $saved = $db->transaction( function () use ( $query ) {
 
                     $newVersion                                        = $this->replicate( [ $this->primaryKey, static::getVersionColumn(), 'updated_at' ] );
                     $newVersion->{static::getVersionColumn()}          = static::getNextVersion( $this->{static::getModelIdColumn()} );
@@ -140,7 +141,7 @@ trait Versioned {
                     if ( $saved ) {
 
                         // toggle the is_current_version flag
-                        DB::table( ( new static )->getTable() )
+                        $db->table( ( new static )->getTable() )
                           ->where( static::getModelIdColumn(), $this->{static::getModelIdColumn()} )
                               ->where( static::getIsCurrentVersionColumn(), 1)
                           ->where( $this->primaryKey, '<>', $this->attributes[$this->primaryKey] )
@@ -235,7 +236,7 @@ trait Versioned {
      * @return mixed
      */
     public static function getNextModelId() {
-        return DB::table( ( new static )->getTable() )->max( static::getModelIdColumn() ) + 1;
+        return (new static)->getConnection()->table( ( new static )->getTable() )->max( static::getModelIdColumn() ) + 1;
     }
 
     /**
@@ -244,7 +245,7 @@ trait Versioned {
      * @return int
      */
     public static function getNextVersion( $modelId ) {
-        return DB::table( ( new static )->getTable() )->where( static::getModelIdColumn() , $modelId )->max( static::getVersionColumn() ) + 1;
+        return (new static)->getConnection()->table( ( new static )->getTable() )->where( static::getModelIdColumn() , $modelId )->max( static::getVersionColumn() ) + 1;
     }
 
     /**
