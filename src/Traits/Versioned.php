@@ -339,4 +339,20 @@ trait Versioned
         return (new static)->newQueryWithoutScope(new VersioningScope)
             ->where(static::getQualifiedIsCurrentVersionColumn(), 0);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getPreviousModel()
+    {
+        return $this->withOldVersions()->where('id', $this->previous_id)->first();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNextModel()
+    {
+        return $this->withOldVersions()->where('id', $this->next_id)->first();
+    }
 }
