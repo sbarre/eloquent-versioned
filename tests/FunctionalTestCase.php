@@ -1,12 +1,15 @@
 <?php namespace EloquentVersioned\Tests;
 
 use Illuminate\Database\Capsule\Manager as DBM;
+use Orchestra\Testbench\TestCase;
 
-class FunctionalTestCase extends \PHPUnit_Framework_TestCase
+class FunctionalTestCase extends TestCase
 {
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->configureDatabase();
         $this->migrateTables();
     }
