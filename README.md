@@ -4,7 +4,7 @@ Adds transparent versioning support to Laravel 5's Eloquent ORM.
 
 **WARNING: This repository is currently super-duper experimental.  I will gladly accept pull requests and issues, but you probably shouldn't use this in production, and the interfaces may change without notice (although major changes will bump the version).**
 
-When using this trait (and with a table that includes the required fields), saving your model will actually create a new row instead, and increment the version number.  
+When using this trait (and with a table that includes the required fields), saving your model will actually create a new row instead, and increment the version number.
 
 Using global scopes, old versions are ignored in the standard ORM operations (selects, updates, deletes) and relations (hasOne, hasMany, belongsTo, etc).
 
@@ -56,7 +56,7 @@ use EloquentVersioned\Traits\Versioned;
 
 When the trait boots it will apply the proper scope, and provides overrides on various Eloquent methods to support versioned records.
 
-Once the trait is applied, you use your models as usual, with the standard queries behaving as usual.   
+Once the trait is applied, you use your models as usual, with the standard queries behaving as usual.
 
 ```php
 $project = Project::create([
@@ -151,9 +151,9 @@ Array
 )
 ```
 
-So the `is_current_version` property is what the global scope is applied against, limiting all select queries to only records where `is_current_version = 1`.  
+So the `is_current_version` property is what the global scope is applied against, limiting all select queries to only records where `is_current_version = 1`.
 
-Calling `save()` on the model replicates the existing model, changes the appropriate properties (including retrieving and setting the next version on the model), and clears the `is_current_version` property on the previous version after saving the new one.  
+Calling `save()` on the model replicates the existing model, changes the appropriate properties (including retrieving and setting the next version on the model), and clears the `is_current_version` property on the previous version after saving the new one.
 
 If you are making a very minor change to a model and you don't want to create a new version, you can call `saveMinor()` instead.
 
