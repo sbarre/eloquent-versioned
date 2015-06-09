@@ -15,11 +15,11 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
     {
         $db = new DBM;
         $db->addConnection(array(
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
-            'charset'   => 'utf8',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
+            'prefix' => '',
         ));
         $db->bootEloquent();
         $db->setAsGlobal();
@@ -27,8 +27,7 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
 
     protected function migrateTables()
     {
-
-        DBM::schema()->create('widgets', function($table) {
+        DBM::schema()->create('widgets', function ($table) {
             $table->increments('id');
             $table->integer('model_id')->unsigned()->default(1);
             $table->integer('version')->unsigned()->default(1);
@@ -39,7 +38,7 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
             $table->timestamps();
         });
 
-        DBM::schema()->create('gadgets', function($table) {
+        DBM::schema()->create('gadgets', function ($table) {
             $table->increments('id');
             $table->integer('model_id')->unsigned()->default(1);
             $table->integer('version')->unsigned()->default(1);
@@ -50,7 +49,7 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
             $table->timestamps();
         });
 
-        DBM::schema()->create('doodads', function($table) {
+        DBM::schema()->create('doodads', function ($table) {
             $table->increments('id');
             $table->integer('model_id')->unsigned()->default(1);
             $table->integer('version')->unsigned()->default(1);
@@ -60,7 +59,5 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
             $table->string('name');
             $table->timestamps();
         });
-
     }
-
 }

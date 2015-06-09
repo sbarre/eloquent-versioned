@@ -2,10 +2,11 @@
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
-class Builder extends EloquentBuilder {
+class Builder extends EloquentBuilder
+{
 
-    const COLUMN_MODEL_ID           = 'model_id';
-    const COLUMN_VERSION            = 'version';
+    const COLUMN_MODEL_ID = 'model_id';
+    const COLUMN_VERSION = 'version';
     const COLUMN_IS_CURRENT_VERSION = 'is_current_version';
 
     /**
@@ -37,10 +38,10 @@ class Builder extends EloquentBuilder {
     }
 
     /**
-     * A method to use with versioned scopes to retrieve a collection of non-current-version
-     * models (either with or without the current version)
+     * A method to use with versioned scopes to retrieve a collection of
+     * non-current-version models (either with or without the current version)
      *
-     * @param $id
+     * @param       $id
      * @param array $columns
      *
      * @return \Illuminate\Database\Eloquent\Collection
@@ -49,6 +50,4 @@ class Builder extends EloquentBuilder {
     {
         return $this->findMany([$id], $columns);
     }
-
-
 }

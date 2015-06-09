@@ -1,6 +1,7 @@
 <?php namespace EloquentVersioned\Tests\Models;
 
-class Widget extends BaseVersionedModel {
+class Widget extends BaseVersionedModel
+{
 
     protected $table = 'widgets';
 
@@ -8,12 +9,13 @@ class Widget extends BaseVersionedModel {
 
     public function gadget()
     {
-        return $this->belongsTo('EloquentVersioned\Tests\Models\Gadget', 'gadget_id');
+        return $this->belongsTo('EloquentVersioned\Tests\Models\Gadget',
+            'gadget_id');
     }
 
     public function doodad()
     {
-        return $this->belongsTo('EloquentVersioned\Tests\Models\Doodad', 'doodad_id');
+        return $this->belongsTo('EloquentVersioned\Tests\Models\Doodad',
+            'doodad_id');
     }
-
 }
