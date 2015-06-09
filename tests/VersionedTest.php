@@ -52,7 +52,6 @@ class VersionedTest extends FunctionalTestCase
         $this->assertEquals('Updated ' . $data['name'], $model->name);
         $this->assertEquals(2, $model->version);
         $this->assertEquals(1, $model->is_current_version);
-        $this->assertEquals(1, $model->previous_id);
 
         // old model exists?
         $oldModel = $className::onlyOldVersions()->find(1);
@@ -67,9 +66,6 @@ class VersionedTest extends FunctionalTestCase
         // two records without scopes applied?
         $models = $className::withOldVersions()->get();
         $this->assertEquals(2, count($models));
-
-        // Original record has next_id set correctly
-        $this->assertEquals(2, $models->first()->next_id);
     }
 
     /**
@@ -93,14 +89,15 @@ class VersionedTest extends FunctionalTestCase
         $model->save();
 
         $previousVersion = $model->getPreviousModel();
-        $this->assertEquals($model->previous_id, $previousVersion->getOriginal('id'));
-        $this->assertEquals($previousVersion->next_id, $model->getOriginal('id'));
+        $this->assertEquals(($model->version - 1), $previousVersion->version);
         $this->assertEquals($firstUpdatedName, $previousVersion->name);
 
         $originalVersion = $previousVersion->getPreviousModel();
-        $this->assertEquals($previousVersion->previous_id, $originalVersion->getOriginal('id'));
-        $this->assertEquals($originalVersion->next_id, $previousVersion->getOriginal('id'));
+        $this->assertEquals(($previousVersion->version - 1), $originalVersion->version);
         $this->assertEquals($data['name'], $originalVersion->name);
+
+        $nonExistingVersion = $originalVersion->getPreviousModel();
+        $this->assertEquals(null, $nonExistingVersion);
     }
 
     /**
@@ -126,14 +123,15 @@ class VersionedTest extends FunctionalTestCase
         $originalVersion = $className::onlyOldVersions()->first();
 
         $nextVersion = $originalVersion->getNextModel();
-        $this->assertEquals($originalVersion->next_id, $nextVersion->getOriginal('id'));
-        $this->assertEquals($nextVersion->previous_id, $originalVersion->getOriginal('id'));
+        $this->assertEquals(($originalVersion->version + 1), $nextVersion->version);
         $this->assertEquals($firstUpdatedName, $nextVersion->name);
 
         $latestVersion = $nextVersion->getNextModel();
-        $this->assertEquals($nextVersion->next_id, $latestVersion->getOriginal('id'));
-        $this->assertEquals($latestVersion->previous_id, $nextVersion->getOriginal('id'));
+        $this->assertEquals(($nextVersion->version + 1), $latestVersion->version);
         $this->assertEquals($secondUpdatedName, $latestVersion->name);
+
+        $nonExistingVersion = $latestVersion->getNextModel();
+        $this->assertEquals(null, $nonExistingVersion);
     }
 
     /**
