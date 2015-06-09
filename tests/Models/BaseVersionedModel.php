@@ -6,5 +6,4 @@ use EloquentVersioned\Traits\Versioned;
 class BaseVersionedModel extends Eloquent
 {
     use Versioned;
-
 }
