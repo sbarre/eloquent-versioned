@@ -52,6 +52,7 @@ class VersionedTest extends FunctionalTestCase
         $this->assertEquals('Updated ' . $data['name'], $model->name);
         $this->assertEquals(2, $model->version);
         $this->assertEquals(1, $model->is_current_version);
+        $this->assertEquals(1, $model->previous_id);
 
         // old model exists?
         $oldModel = $className::onlyOldVersions()->find(1);
@@ -66,6 +67,9 @@ class VersionedTest extends FunctionalTestCase
         // two records without scopes applied?
         $models = $className::withOldVersions()->get();
         $this->assertEquals(2, count($models));
+
+        // Original record has next_id set correctly
+        $this->assertEquals(2, $models->first()->next_id);
     }
 
     /**

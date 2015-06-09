@@ -34,6 +34,8 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
             $table->integer('is_current_version')->unsigned()->default(1);
             $table->integer('gadget_id')->unsigned()->default(0);
             $table->integer('doodad_id')->unsigned()->default(0);
+            $table->integer('previous_id')->unsigned()->nullable();
+            $table->integer('next_id')->unsigned()->nullable();
             $table->string('name');
             $table->timestamps();
         });
@@ -45,6 +47,8 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
             $table->integer('is_current_version')->unsigned()->default(1);
             $table->integer('widget_id')->unsigned()->default(0);
             $table->integer('doodad_id')->unsigned()->default(0);
+            $table->integer('previous_id')->unsigned()->nullable();
+            $table->integer('next_id')->unsigned()->nullable();
             $table->string('name');
             $table->timestamps();
         });
@@ -56,6 +60,8 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
             $table->integer('is_current_version')->unsigned()->default(1);
             $table->integer('gadget_id')->unsigned()->default(0);
             $table->integer('widget_id')->unsigned()->default(0);
+            $table->integer('previous_id')->unsigned()->nullable();
+            $table->integer('next_id')->unsigned()->nullable();
             $table->string('name');
             $table->timestamps();
         });
