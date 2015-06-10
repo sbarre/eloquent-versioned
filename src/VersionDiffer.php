@@ -2,10 +2,12 @@
 
 namespace EloquentVersioned;
 
+use EloquentVersioned\Exceptions\IncompatibleModelMismatchException;
 use Illuminate\Database\Eloquent\Model;
 
 class VersionDiffer
 {
+
     private $ignoredFields = [
         'is_current_version',
         'version',
@@ -16,6 +18,10 @@ class VersionDiffer
 
     public function diff(Model $left, Model $right)
     {
+        if (($left instanceof $right) === false) {
+            throw new IncompatibleModelMismatchException;
+        }
+
         $changes = [];
         $leftAttributes = array_except($left->getAttributes(), $this->ignoredFields);
         $rightAttributes = array_except($right->getAttributes(), $this->ignoredFields);

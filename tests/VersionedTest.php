@@ -1,5 +1,7 @@
 <?php namespace EloquentVersioned\Tests;
 
+use EloquentVersioned\Exceptions\IncompatibleModelMismatchException;
+use EloquentVersioned\Tests\Models\UnusedModel;
 use EloquentVersioned\VersionDiffer;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
@@ -125,6 +127,9 @@ class VersionedTest extends FunctionalTestCase
             ],
             $changes
         );
+
+        $this->setExpectedException(IncompatibleModelMismatchException::class);
+        (new VersionDiffer)->diff((new UnusedModel), (new $className));
     }
 
     /**
