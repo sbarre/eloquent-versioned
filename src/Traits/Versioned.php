@@ -136,6 +136,7 @@ trait Versioned
                         static::getVersionColumn(),
                         'updated_at'
                     ]);
+                    $newVersion->fireModelEvent('creating');
                     $newVersion->{static::getVersionColumn()} = static::getNextVersion($this->{static::getModelIdColumn()});
                     $newVersion->{static::getIsCurrentVersionColumn()} = 1;
                     $newVersion->updated_at = $this->freshTimestamp();
@@ -226,7 +227,7 @@ trait Versioned
         // are, as this attributes arrays must contain an "id" column already placed
         // there by the developer as the manually determined key for these models.
         else {
-            $query->insert($attributes);
+            self::create($attributes);
         }
 
         // We will go ahead and set the exists property to true, so that it is set when
