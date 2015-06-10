@@ -181,7 +181,9 @@ trait Versioned
         // ID attribute on the model to the value of the newly inserted row's ID
         // which is typically an auto-increment value managed by the database.
         else {
-            $this->{static::getModelIdColumn()} = static::getNextModelId();
+            if($this->{static::getModelIdColumn()} === null) {
+                $this->{static::getModelIdColumn()} = static::getNextModelId();
+            }
             $saved = $this->performInsert($query, $options);
         }
 
