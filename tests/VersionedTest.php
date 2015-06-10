@@ -95,6 +95,36 @@ class VersionedTest extends FunctionalTestCase
     }
 
     /**
+     * Making changes to fields marked as minor shouldn't create a new version
+     *
+     * @param  array $data
+     *
+     * @dataProvider createMinorEditsDataProvider
+     */
+    public function testMinorEdits($data)
+    {
+        $className = $this->modelPrefix . $data['name'];
+        $model = $className::create($data)->fresh();
+
+        $newName = 'Updated ' . $data['name'];
+        $model->name = $newName;
+        $model->save();
+
+        // was the model updated with a minor edit?
+        $this->assertEquals(1, $model->id);
+        $this->assertEquals($newName, $model->name);
+        $this->assertEquals(1, $model->version);
+
+        $newTitle = 'The New Bar';
+        $model->title = $newTitle;
+        $model->save();
+
+        // was the model updated with a major edit?
+        $this->assertEquals($newTitle, $model->title);
+        $this->assertEquals(2, $model->version);
+    }
+
+    /**
      * Provides objects to use by tests
      *
      * @return array
@@ -118,5 +148,22 @@ class VersionedTest extends FunctionalTestCase
             ),
             array(array('name' => 'Doodad', 'widget_id' => 1, 'gadget_id' => 1))
         );
+    }
+
+    /**
+     * Provides objects to use by tests
+     *
+     * @return array
+     */
+    public function createMinorEditsDataProvider()
+    {
+        return [
+            [
+                [
+                    'name' => 'Bar',
+                    'title' => 'The Bar',
+                ],
+            ],
+        ];
     }
 }
