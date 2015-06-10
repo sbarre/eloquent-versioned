@@ -26,4 +26,8 @@ class Foo extends BaseVersionedModel
     {
         return Uuid::uuid4();
     }
+
+    public static function getNextModelId() {
+        return Uuid::uuid4();
+    }
 }
