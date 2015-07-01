@@ -54,7 +54,7 @@ class VersionedTest extends FunctionalTestCase
         $this->assertEquals(1, $model->is_current_version);
 
         // old model exists?
-        $oldModel = $className::onlyOldVersions()->find(1);
+        $oldModel = $className::onlyOldVersions()->first();
         $this->assertInstanceOf($this->modelPrefix . $data['name'], $oldModel);
         $this->assertEquals(1, $oldModel->version);
         $this->assertEquals(0, $oldModel->is_current_version);

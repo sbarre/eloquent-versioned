@@ -14,6 +14,30 @@ trait AppendedVersioning
 {
     use Versioned;
 
+    /*
+     * ACCESSORS + MUTATORS
+     */
+
+    /**
+     * @return mixed
+     */
+    public function getIdAttribute()
+    {
+        return array_key_exists('id', $this->attributes) ? $this->attributes[$this->primaryKey] : null;
+    }
+
+    /*
+     * ELOQUENT OVERRIDES
+     */
+
+    /**
+     * @return string
+     */
+    public function getKeyName()
+    {
+        return parent::getKeyName();
+    }
+
     /**
      * Save a new version of the model
      *
