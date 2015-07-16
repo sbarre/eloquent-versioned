@@ -116,13 +116,6 @@ class VersionedTest extends FunctionalTestCase
                     'doodad_id' => 1
                 )
             ),
-            array(array('name' => 'Doodad', 'widget_id' => 1, 'gadget_id' => 1)),
-            [
-                [
-                    'name' => 'Thingy',
-                    'email' => 'test@example.net',
-                ],
-            ],
         );
     }
 }

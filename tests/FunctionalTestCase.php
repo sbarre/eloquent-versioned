@@ -59,15 +59,5 @@ class FunctionalTestCase extends \PHPUnit_Framework_TestCase
             $table->string('name');
             $table->timestamps();
         });
-
-        DBM::schema()->create('thingies', function ($table) {
-            $table->increments('id');
-            $table->integer('model_id')->unsigned()->default(1);
-            $table->integer('version')->unsigned()->default(1);
-            $table->integer('is_current_version')->unsigned()->default(1);
-            $table->string('name');
-            $table->string('email');
-            $table->timestamps();
-        });
     }
 }
