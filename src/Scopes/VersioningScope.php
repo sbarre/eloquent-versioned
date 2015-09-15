@@ -31,7 +31,7 @@ class VersioningScope implements ScopeInterface
             }
             if ($value['column'] == $column) {
                 if ($bindings[$bindKey - 1] == 1) {
-                    unset($bindings[$key]);
+                    unset($bindings[$bindKey - 1]);
                 }
                 unset($query->wheres[$key]);
             }
