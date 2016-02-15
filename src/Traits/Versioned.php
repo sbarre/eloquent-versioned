@@ -137,12 +137,12 @@ trait Versioned
             }
         }
 
-        // If the model is brand new, we'll insert it into our database, 
+        // If the model is brand new, we'll insert it into our database,
         // then set the model_id to the id of the newly created record.
         else {
             $saved = $this->performInsert($query, $options);
             $this->{static::getModelIdColumn()} = $this->{$this->primaryKey};
-            $saved = $saved && $this->performUpdate($query, $options)
+            $saved = $saved && $this->performUpdate($query, $options);
         }
 
         if ($saved) {

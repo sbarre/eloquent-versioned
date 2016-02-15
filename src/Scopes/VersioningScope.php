@@ -12,34 +12,6 @@ class VersioningScope implements ScopeInterface
     public function apply(Builder $builder, Model $model)
     {
         $builder->where($model->getQualifiedIsCurrentVersionColumn(), 1);
-
-        $this->extend($builder);
-    }
-
-    public function remove(Builder $builder, Model $model)
-    {
-        $column = $model->getQualifiedIsCurrentVersionColumn();
-
-        $query = $builder->getQuery();
-        $bindings = $query->getBindings();
-
-        $bindKey = 0;
-
-        foreach ((array)$query->wheres as $key => $value) {
-            if (strtolower($value['type']) == 'basic') {
-                $bindKey++;
-            }
-            if ($value['column'] == $column) {
-                if ($bindings[$bindKey - 1] == 1) {
-                    unset($bindings[$bindKey - 1]);
-                }
-                unset($query->wheres[$key]);
-            }
-        }
-
-        $query->wheres = array_values($query->wheres);
-
-        $builder->setBindings(array_values($bindings));
     }
 
     /**
@@ -58,9 +30,7 @@ class VersioningScope implements ScopeInterface
     protected function addWithOldVersions(Builder $builder)
     {
         $builder->macro('withOldVersions', function (Builder $builder) {
-            $this->remove($builder, $builder->getModel());
-
-            return $builder;
+            return $builder->withoutGlobalScope($this);
         });
     }
 
@@ -71,10 +41,8 @@ class VersioningScope implements ScopeInterface
     {
         $builder->macro('onlyOldVersions', function (Builder $builder) {
             $model = $builder->getModel();
-            $this->remove($builder, $model);
 
-            $builder->getQuery()->where($model->getQualifiedIsCurrentVersionColumn(),
-                0);
+            $builder->withoutGlobalScope($this)->where($model->getQualifiedIsCurrentVersionColumn(),0);
 
             return $builder;
         });

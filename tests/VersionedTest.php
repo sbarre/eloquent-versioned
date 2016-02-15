@@ -178,7 +178,7 @@ class VersionedTest extends FunctionalTestCase
         $model->name = 'Updated ' . $data['name'];
         $model->save();
 
-        $originalModel = $className::onlyOldVersions()->find(1);
+        $originalModel = $className::onlyOldVersions()->first();
 
         $changes = (new VersionDiffer)->diff($originalModel, $model);
 
