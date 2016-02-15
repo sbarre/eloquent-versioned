@@ -72,6 +72,72 @@ class VersionedTest extends FunctionalTestCase
     }
 
     /**
+     * Using getPreviousModel() should get the previous version of the model
+     *
+     * @param  array $data
+     * @dataProvider createDataProvider
+     */
+    public function testGetPreviousVersion($data)
+    {
+        $className = $this->modelPrefix . $data['name'];
+        $model     = $className::create( $data )->fresh();
+
+        $firstUpdatedName = 'Updated ' . $data['name'];
+        $secondUpdatedName = 'Updated again ' . $data['name'];
+
+        $model->name = $firstUpdatedName;
+        $model->save();
+
+        $model->name = $secondUpdatedName;
+        $model->save();
+
+        $previousVersion = $model->getPreviousModel();
+        $this->assertEquals(($model->version - 1), $previousVersion->version);
+        $this->assertEquals($firstUpdatedName, $previousVersion->name);
+
+        $originalVersion = $previousVersion->getPreviousModel();
+        $this->assertEquals(($previousVersion->version - 1), $originalVersion->version);
+        $this->assertEquals($data['name'], $originalVersion->name);
+
+        $nonExistingVersion = $originalVersion->getPreviousModel();
+        $this->assertEquals(null, $nonExistingVersion);
+    }
+
+    /**
+     * Using getNextModel() should get the next version of the model
+     *
+     * @param  array $data
+     * @dataProvider createDataProvider
+     */
+    public function testGetNextModel($data)
+    {
+        $className = $this->modelPrefix . $data['name'];
+        $model     = $className::create( $data )->fresh();
+
+        $firstUpdatedName = 'Updated ' . $data['name'];
+        $secondUpdatedName = 'Updated again ' . $data['name'];
+
+        $model->name = $firstUpdatedName;
+        $model->save();
+
+        $model->name = $secondUpdatedName;
+        $model->save();
+
+        $originalVersion = $className::onlyOldVersions()->first();
+
+        $nextVersion = $originalVersion->getNextModel();
+        $this->assertEquals(($originalVersion->version + 1), $nextVersion->version);
+        $this->assertEquals($firstUpdatedName, $nextVersion->name);
+
+        $latestVersion = $nextVersion->getNextModel();
+        $this->assertEquals(($nextVersion->version + 1), $latestVersion->version);
+        $this->assertEquals($secondUpdatedName, $latestVersion->name);
+
+        $nonExistingVersion = $latestVersion->getNextModel();
+        $this->assertEquals(null, $nonExistingVersion);
+    }
+
+    /**
      * Using saveMinor() should not create a new version
      *
      * @param  array $data
