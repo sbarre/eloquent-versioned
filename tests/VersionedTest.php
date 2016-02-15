@@ -1,5 +1,8 @@
 <?php namespace EloquentVersioned\Tests;
 
+use EloquentVersioned\Exceptions\IncompatibleModelMismatchException;
+use EloquentVersioned\Tests\Models\UnusedModel;
+use EloquentVersioned\VersionDiffer;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class VersionedTest extends FunctionalTestCase
@@ -54,7 +57,7 @@ class VersionedTest extends FunctionalTestCase
         $this->assertEquals(1, $model->is_current_version);
 
         // old model exists?
-        $oldModel = $className::onlyOldVersions()->find(1);
+        $oldModel = $className::onlyOldVersions()->first();
         $this->assertInstanceOf($this->modelPrefix . $data['name'], $oldModel);
         $this->assertEquals(1, $oldModel->version);
         $this->assertEquals(0, $oldModel->is_current_version);
@@ -66,6 +69,72 @@ class VersionedTest extends FunctionalTestCase
         // two records without scopes applied?
         $models = $className::withOldVersions()->get();
         $this->assertEquals(2, count($models));
+    }
+
+    /**
+     * Using getPreviousModel() should get the previous version of the model
+     *
+     * @param  array $data
+     * @dataProvider createDataProvider
+     */
+    public function testGetPreviousVersion($data)
+    {
+        $className = $this->modelPrefix . $data['name'];
+        $model     = $className::create( $data )->fresh();
+
+        $firstUpdatedName = 'Updated ' . $data['name'];
+        $secondUpdatedName = 'Updated again ' . $data['name'];
+
+        $model->name = $firstUpdatedName;
+        $model->save();
+
+        $model->name = $secondUpdatedName;
+        $model->save();
+
+        $previousVersion = $model->getPreviousModel();
+        $this->assertEquals(($model->version - 1), $previousVersion->version);
+        $this->assertEquals($firstUpdatedName, $previousVersion->name);
+
+        $originalVersion = $previousVersion->getPreviousModel();
+        $this->assertEquals(($previousVersion->version - 1), $originalVersion->version);
+        $this->assertEquals($data['name'], $originalVersion->name);
+
+        $nonExistingVersion = $originalVersion->getPreviousModel();
+        $this->assertEquals(null, $nonExistingVersion);
+    }
+
+    /**
+     * Using getNextModel() should get the next version of the model
+     *
+     * @param  array $data
+     * @dataProvider createDataProvider
+     */
+    public function testGetNextModel($data)
+    {
+        $className = $this->modelPrefix . $data['name'];
+        $model     = $className::create( $data )->fresh();
+
+        $firstUpdatedName = 'Updated ' . $data['name'];
+        $secondUpdatedName = 'Updated again ' . $data['name'];
+
+        $model->name = $firstUpdatedName;
+        $model->save();
+
+        $model->name = $secondUpdatedName;
+        $model->save();
+
+        $originalVersion = $className::onlyOldVersions()->first();
+
+        $nextVersion = $originalVersion->getNextModel();
+        $this->assertEquals(($originalVersion->version + 1), $nextVersion->version);
+        $this->assertEquals($firstUpdatedName, $nextVersion->name);
+
+        $latestVersion = $nextVersion->getNextModel();
+        $this->assertEquals(($nextVersion->version + 1), $latestVersion->version);
+        $this->assertEquals($secondUpdatedName, $latestVersion->name);
+
+        $nonExistingVersion = $latestVersion->getNextModel();
+        $this->assertEquals(null, $nonExistingVersion);
     }
 
     /**
@@ -92,6 +161,41 @@ class VersionedTest extends FunctionalTestCase
         // still only one record?
         $models = $className::all();
         $this->assertEquals(1, count($models));
+    }
+
+    /**
+     * Using saveMinor() should not create a new version
+     *
+     * @param  array $data
+     *
+     * @dataProvider createDataProvider
+     */
+    public function testVersionDifferences($data)
+    {
+        $className = $this->modelPrefix . $data['name'];
+        $model = $className::create($data)->fresh();
+
+        $model->name = 'Updated ' . $data['name'];
+        $model->save();
+
+        $originalModel = $className::onlyOldVersions()->find(1);
+
+        $changes = (new VersionDiffer)->diff($originalModel, $model);
+
+        $this->assertArraySubset(
+            [
+                'name' => [
+                    0 => $data['name'],
+                    1 => 'Updated ' . $data['name'],
+                    'left' => $data['name'],
+                    'right' => 'Updated ' . $data['name'],
+                ],
+            ],
+            $changes
+        );
+
+        $this->setExpectedException(IncompatibleModelMismatchException::class);
+        (new VersionDiffer)->diff((new UnusedModel), (new $className));
     }
 
     /**
