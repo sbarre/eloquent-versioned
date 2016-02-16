@@ -148,48 +148,16 @@ trait Versioned
                     $oldVersion->{static::getIsCurrentVersionColumn()} = 0;
 
                     $oldVersion->performInsert($query, ['timestamps' => false]);
-/*
-                    $newVersion = $this->replicate([
-                        $this->primaryKey,
-                        static::getVersionColumn(),
-                        'updated_at'
-                    ]);
-                    $newVersion->{static::getVersionColumn()} = static::getNextVersion($this->{static::getModelIdColumn()});
-                    $newVersion->{static::getIsCurrentVersionColumn()} = 1;
-                    $newVersion->updated_at = $this->freshTimestamp();
-*/
 
                     // trigger the update event
                     if ($this->fireModelEvent('updating') === false) {
                         return false;
                     }
 
-/*
-                    // clear out the old stuff
-                    unset($this->attributes[$this->primaryKey]);
-                    unset($this->attributes['updated_at']);
-                    $this->forceFill($newVersion->getAttributes());
-                    $saved = $this->performVersionedInsert($query, ['timestamps' => false]);
-*/
                     $this->updated_at = $this->freshTimestamp();
                     $this->{static::getVersionColumn()} = static::getNextVersion($this->{static::getModelIdColumn()});
 
                     $saved = $this->performUpdate($query, $options);
-/*
-                    if ($saved) {
-
-                        // toggle the is_current_version flag
-                        $db->table((new static)->getTable())
-                            ->where(static::getModelIdColumn(),
-                                $this->{static::getModelIdColumn()})
-                            ->where(static::getIsCurrentVersionColumn(), 1)
-                            ->where($this->primaryKey, '<>',
-                                $this->attributes[$this->primaryKey])
-                            ->update([static::getIsCurrentVersionColumn() => 0]);
-
-                        $this->fireModelEvent('updated', false);
-                    }
-*/
 
                     // this returns from the closure, not the function!
                     return $saved;
