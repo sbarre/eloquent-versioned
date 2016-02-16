@@ -127,7 +127,7 @@ The model mutates the `model_id` column into `id`, and hides some of the version
 ```php
 Array
 (
-    [id] => 2
+    [id] => 1
     [model_id] => 1
     [version] => 2
     [is_current_version] => 1
@@ -143,7 +143,7 @@ While the row for our first version now looks like this:
 ```php
 Array
 (
-    [id] => 1
+    [id] => 2
     [model_id] => 1
     [version] => 1
     [is_current_version] => 0
@@ -181,6 +181,21 @@ $oldVersions = Project::onlyOldVersions()->find(1);
 ```
 
 Otherwise, the rest of Eloquent's ORM operations should work as usual, including the out-of-the-box relations.
+
+#### Methods for moving through a model's versions
+
+If you want to navigate through a model's versions:
+
+```php
+$current = Project::find(1);
+
+$previous = $current->getPreviousModel();
+$next = $previous->getNextModel();
+
+// $next == $current
+```
+
+If you are at the most recent version, `getNextModel()` will return `null` and likewise if you are at the oldest version, `getPreviousModel()` will return `null`.
 
 ## Support & Roadmap
 
