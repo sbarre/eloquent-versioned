@@ -122,7 +122,7 @@ Array
 )
 ```
 
-The model mutates the `model_id` column into `id`, and hides some of the version-specific columns.  In reality this is actually a new database row that looks like this:
+The model mutates the `model_id` column into `id`, and hides some of the version-specific columns.  In reality this is actually the same database row that now looks like this:
 
 ```php
 Array
@@ -138,7 +138,7 @@ Array
 )
 ```
 
-While the row for our first version now looks like this:
+While a new row is inserted to save our previous version, which now looks like this:
 
 ```php
 Array
@@ -156,7 +156,7 @@ Array
 
 So the `is_current_version` property is what the global scope is applied against, limiting all select queries to only records where `is_current_version = 1`.
 
-Calling `save()` on the model replicates the existing model, changes the appropriate properties (including retrieving and setting the next version on the model), and clears the `is_current_version` property on the previous version after saving the new one.
+Calling `save()` on a model replicates the original version into a new row (with `is_current_version = 0`), then increments the `version_id` property on our current model, changes the appropriate timestamps, and saves it.
 
 If you are making a very minor change to a model and you don't want to create a new version, you can call `saveMinor()` instead.
 
@@ -184,7 +184,7 @@ Otherwise, the rest of Eloquent's ORM operations should work as usual, including
 
 #### Methods for moving through a model's versions
 
-If you want to navigate through a model's versions:
+If you want to navigate through all of model's versions, in a linked-list manner:
 
 ```php
 $current = Project::find(1);
