@@ -32,6 +32,28 @@ trait Versioned
      */
 
     /**
+     * @return mixed
+     */
+    public function getIdAttribute()
+    {
+        return ($this->{static::getIsCurrentVersionColumn()} == 0) ?
+            $this->attributes[$this->primaryKey] :
+            $this->attributes[static::getModelIdColumn()];
+    }
+
+    /*
+     * ELOQUENT OVERRIDES
+     */
+
+    /**
+     * @return string
+     */
+    public function getKeyName()
+    {
+        return $this->isVersioned ? $this->getModelIdColumn() : $this->primaryKey;
+    }
+
+    /**
      * @param $query
      *
      * @return VersionedBuilder
@@ -80,7 +102,7 @@ trait Versioned
      *
      * @return mixed
      */
-    public function saveMinor(array $options = array())
+    public function saveMinor(array $options = [])
     {
         return parent::save($options);
     }
@@ -111,37 +133,79 @@ trait Versioned
         // "where" clause to only update this model. Otherwise, we'll just
         // insert them.
         if ($this->exists) {
-            if ($this->isDirty()) {
-                $saved = $db->transaction(function () use ($query, $db, $options) {
-                    $oldVersion = $this->replicate();
-                    $oldVersion->forceFill($this->original);
-                    $oldVersion->{$this->primaryKey} = null;
-                    $oldVersion->{static::getIsCurrentVersionColumn()} = false;
 
-                    $this->performVersionedInsert($query, $oldVersion);
+            $dirty = $this->isDirty();
+
+            if (count($dirty)>0) {
+
+                $saved = $db->transaction(function () use ($query, $db, $options) {
+
+                    // create old version, save new one in place
+                    $oldVersion = $this->replicate([$this->primaryKey]);
+                    $oldVersion->forceFill($this->original);
+                    unset($oldVersion->attributes[$this->primaryKey]);
+                    $oldVersion->updated_at = $this->freshTimestamp();
+                    $oldVersion->{static::getIsCurrentVersionColumn()} = 0;
+
+                    $oldVersion->performInsert($query, ['timestamps' => false]);
+/*
+                    $newVersion = $this->replicate([
+                        $this->primaryKey,
+                        static::getVersionColumn(),
+                        'updated_at'
+                    ]);
+                    $newVersion->{static::getVersionColumn()} = static::getNextVersion($this->{static::getModelIdColumn()});
+                    $newVersion->{static::getIsCurrentVersionColumn()} = 1;
+                    $newVersion->updated_at = $this->freshTimestamp();
+*/
 
                     // trigger the update event
                     if ($this->fireModelEvent('updating') === false) {
                         return false;
                     }
 
+/*
+                    // clear out the old stuff
+                    unset($this->attributes[$this->primaryKey]);
+                    unset($this->attributes['updated_at']);
+                    $this->forceFill($newVersion->getAttributes());
+                    $saved = $this->performVersionedInsert($query, ['timestamps' => false]);
+*/
+                    $this->updated_at = $this->freshTimestamp();
                     $this->{static::getVersionColumn()} = static::getNextVersion($this->{static::getModelIdColumn()});
-                    $saved = $this->performUpdate($query, $options);
 
+                    $saved = $this->performUpdate($query, $options);
+/*
                     if ($saved) {
+
+                        // toggle the is_current_version flag
+                        $db->table((new static)->getTable())
+                            ->where(static::getModelIdColumn(),
+                                $this->{static::getModelIdColumn()})
+                            ->where(static::getIsCurrentVersionColumn(), 1)
+                            ->where($this->primaryKey, '<>',
+                                $this->attributes[$this->primaryKey])
+                            ->update([static::getIsCurrentVersionColumn() => 0]);
+
                         $this->fireModelEvent('updated', false);
                     }
+*/
 
+                    // this returns from the closure, not the function!
                     return $saved;
+
                 });
+            } else {
+                $saved = true;
             }
         }
 
         // If the model is brand new, we'll insert it into our database,
         // then set the model_id to the id of the newly created record.
         else {
+            $this->{static::getIsCurrentVersionColumn()} = 1;
             $saved = $this->performInsert($query, $options);
-            $this->{static::getModelIdColumn()} = $this->{$this->primaryKey};
+            $this->{static::getModelIdColumn()} = $this->attributes[$this->primaryKey];
             $saved = $saved && $this->performUpdate($query, $options);
         }
 
@@ -167,9 +231,38 @@ trait Versioned
      * @param Builder $query
      * @param Model   $model
      */
-    public function performVersionedInsert(Builder $query, Model $model)
+    protected function performVersionedInsert(Builder $query, array $options = array())
     {
-        return $query->insert($model->getAttributes());
+        // First we'll need to create a fresh query instance and touch the creation and
+        // update timestamps on this model, which are maintained by us for developer
+        // convenience. After, we will just continue saving these model instances.
+        if ($this->timestamps && array_get($options, 'timestamps', true)) {
+            $this->updateTimestamps();
+        }
+
+        // If the model has an incrementing key, we can use the "insertGetId" method on
+        // the query builder, which will give us back the final inserted ID for this
+        // table from the database. Not all tables have to be incrementing though.
+        $attributes = $this->attributes;
+
+        if ($this->incrementing) {
+            $this->insertAndSetId($query, $attributes);
+        }
+
+        // If the table is not incrementing we'll simply insert this attributes as they
+        // are, as this attributes arrays must contain an "id" column already placed
+        // there by the developer as the manually determined key for these models.
+        else {
+            $query->insert($attributes);
+        }
+
+        // We will go ahead and set the exists property to true, so that it is set when
+        // the created event is fired, just in case the developer tries to update it
+        // during the event. This will allow them to do so and run an update here.
+        $this->exists = true;
+
+        return true;
+
     }
 
     /**

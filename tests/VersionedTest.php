@@ -170,16 +170,13 @@ class VersionedTest extends FunctionalTestCase
      *
      * @dataProvider createDataProvider
      */
-    public function _testVersionDifferences($data)
+    public function testVersionDifferences($data)
     {
         $className = $this->modelPrefix . $data['name'];
         $model = $className::create($data)->fresh();
 
         $model->name = 'Updated ' . $data['name'];
         $model->save();
-
-        print_r($className::withOldVersions()->get()->toArray());
-        exit;
 
         $originalModel = $className::onlyOldVersions()->find(1);
 
