@@ -2,9 +2,9 @@
 
 Adds transparent versioning support to Laravel 5.2's Eloquent ORM.
 
-**WARNING: This repository is currently super-duper experimental.  I will gladly accept pull requests and issues, but you probably shouldn't use this in production, and the interfaces may change without notice (although major changes will bump the version).
+**WARNING: This repository is currently super-duper experimental.  I will gladly accept pull requests and issues, but you probably shouldn't use this in production, and the interfaces may change without notice (although major changes will bump the version).**
 
-It was also recently updated to bring global scopes in line with Laravel 5.2
+**It was also recently updated to bring global scopes in line with Laravel 5.2
 so if you are not yet on 5.2, stick with release 0.0.7.**
 
 When using this trait (and with a table that includes the required fields), saving your model will actually create a new row instead, and increment the version number.
