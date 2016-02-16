@@ -1,6 +1,6 @@
 {
   "name": "sbarre/eloquent-versioned",
-  "description": "Add transparent versioning to Laravel 5's Eloquent ORM",
+  "description": "Add transparent versioning to Laravel 5.2's Eloquent ORM",
   "keywords": [
     "laravel",
     "versioning",
@@ -17,11 +17,11 @@
   ],
   "require": {
     "php": ">=5.4",
-    "illuminate/database": "~5.0"
+    "illuminate/database": "~5.2"
   },
   "require-dev": {
     "phpunit/phpunit": "4.6.*",
-    "laravel/framework": "~5.0"
+    "laravel/framework": "~5.2"
   },
   "autoload": {
     "psr-4": {
