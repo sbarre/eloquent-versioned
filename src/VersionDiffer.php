@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class VersionDiffer
 {
 
+	/**
+	 * @var array
+	 */
     private $ignoredFields = [
         'is_current_version',
         'version',
@@ -16,15 +19,25 @@ class VersionDiffer
         'deleted_at',
     ];
 
-    public function diff(Model $left, Model $right)
+    /**
+     * @param Model $left
+     * @param Model $right
+     * @param array $ignoredFields additional fields to ignore in the diff
+     *
+     * @return array
+     * @throws IncompatibleModelMismatchException
+     */
+    public function diff(Model $left, Model $right, $ignoredFields = [])
     {
         if (($left instanceof $right) === false) {
             throw new IncompatibleModelMismatchException;
         }
 
+	    $ignoredFields = array_merge($this->ignoredFields, $ignoredFields);
+
         $changes = [];
-        $leftAttributes = array_except($left->getAttributes(), $this->ignoredFields);
-        $rightAttributes = array_except($right->getAttributes(), $this->ignoredFields);
+        $leftAttributes = array_except($left->getAttributes(), $ignoredFields);
+        $rightAttributes = array_except($right->getAttributes(), $ignoredFields);
 
         $differences = array_diff($leftAttributes, $rightAttributes);
 

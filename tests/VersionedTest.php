@@ -199,6 +199,36 @@ class VersionedTest extends FunctionalTestCase
     }
 
     /**
+     * Test that revertTo() works properly
+     *
+     * @param $data
+     *
+     * @dataProvider createDataProvider
+     */
+    public function testRevertTo($data)
+    {
+        $className = $this->modelPrefix . $data['name'];
+        $model = $className::create($data)->fresh();
+
+        $model->name = 'Updated ' . $data['name'];
+        $model->save();
+
+        $model->revertTo(1);
+
+        $revertedModel = $className::find(1);
+
+        // our name has reverted
+        $this->assertEquals($revertedModel->name, $data['name']);
+
+        // we are on version 3
+        $this->assertEquals($revertedModel->version, 3);
+
+        // we should have 3 models total
+        $this->assertEquals($className::withOldVersions()->count(),3);
+
+    }
+
+    /**
      * Provides objects to use by tests
      *
      * @return array

@@ -144,7 +144,6 @@ trait Versioned
                     $oldVersion = $this->replicate([$this->primaryKey]);
                     $oldVersion->forceFill($this->original);
                     unset($oldVersion->attributes[$this->primaryKey]);
-                    $oldVersion->updated_at = $this->freshTimestamp();
                     $oldVersion->{static::getIsCurrentVersionColumn()} = 0;
 
                     $oldVersion->performInsert($query, ['timestamps' => false]);
@@ -156,8 +155,22 @@ trait Versioned
 
                     $this->updated_at = $this->freshTimestamp();
                     $this->{static::getVersionColumn()} = static::getNextVersion($this->{static::getModelIdColumn()});
+	                $this->{static::getIsCurrentVersionColumn()} = 1;
+	                $this->updated_at = $this->freshTimestamp();
 
                     $saved = $this->performUpdate($query, $options);
+
+	                // clear any other current version columns - we have to do this
+	                // because we might be reverting from a previous non-current model,
+	                // and not just saving the currently-current(?) model.
+	                if ($saved) {
+
+		                $db->table( (new static)->getTable() )
+			                ->where( static::getModelIdColumn(), $this->{static::getModelIdColumn()} )
+			                ->where( static::getIsCurrentVersionColumn(), 1 )
+	                        ->where( $this->primaryKey, '<>', $this->attributes[ $this->primaryKey ] )
+			                ->update( [ static::getIsCurrentVersionColumn() => 0] );
+	                }
 
                     // this returns from the closure, not the function!
                     return $saved;
@@ -351,4 +364,23 @@ trait Versioned
             ->where('version', ($this->version + 1))
             ->first();
     }
+
+    /**
+     * Switch the model to a different version
+     *
+     * @param int $version
+     */
+    public function revertTo($version)
+    {
+        $model = $this->onlyOldVersions()
+	        ->where('version',intval($version))
+	        ->where('model_id', $this->model_id)
+	        ->first();
+        if ($model) {
+	        $revertedAttributes = array_except($model->attributes,[$this->primaryKey]);
+	        $this->forceFill($revertedAttributes);
+            $this->save();
+        }
+    }
+
 }
