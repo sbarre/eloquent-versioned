@@ -169,7 +169,7 @@ $project->saveMinor(); // doesn't create a new version
 If you want to retrieve a list of all versions of a model (or include old versions in a bigger query):
 
 ```php
-$projectVersions = Project::withOldVersions()->find(1);
+$projectVersions = Project::withOldVersions()->findAll(1);
 ```
 
 If run after our example above, this would return an array with 2 models.
@@ -177,7 +177,7 @@ If run after our example above, this would return an array with 2 models.
 You can also retrieve a list of *only* old models by using:
 
 ```php
-$oldVersions = Project::onlyOldVersions()->find(1);
+$oldVersions = Project::onlyOldVersions()->findAll(1);
 ```
 
 Otherwise, the rest of Eloquent's ORM operations should work as usual, including the out-of-the-box relations.
